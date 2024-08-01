@@ -1,6 +1,6 @@
 import {create} from 'zustand'
 import { DraftPatient, Patient } from './types'
-import { devtools } from 'zustand/middleware';
+import {  devtools, persist } from 'zustand/middleware';
 
 type PatientState = {
     patients: Patient[];
@@ -19,28 +19,35 @@ const createPatient = (data: DraftPatient): Patient => {
 }
 
 export const usePatientStore = create<PatientState>()(
-    devtools((set, get) => ({
-        patients: [],
-        activePatient: '',
-        addPatient: (data: DraftPatient) => {
-            const patient = createPatient(data)
-    
-            set((state)=>({
-                patients: [...state.patients, patient]
-            }))
-        },
-        deletePatient: (id) => {
-            set((state) => ({
-                patients: state.patients.filter((patient) => patient.id !== id)
-            }))
-        },
-        getPatientById: (id) => set({activePatient: id}),
-        updatePatient: (patient) => {
-            const updtedPatients = get().patients.map(p => p.id === patient.id ? patient : p)
-            set({
-                patients:updtedPatients,
-                activePatient: ''
-            })
-        }
-    }))
+    devtools(
+        persist(
+            (set, get) => ({
+                patients: [],
+                activePatient: '',
+                addPatient: (data: DraftPatient) => {
+                    const patient = createPatient(data)
+            
+                    set((state)=>({
+                        patients: [...state.patients, patient]
+                    }))
+                },
+                deletePatient: (id) => {
+                    set((state) => ({
+                        patients: state.patients.filter((patient) => patient.id !== id)
+                    }))
+                },
+                getPatientById: (id) => set({activePatient: id}),
+                updatePatient: (patient) => {
+                    const updtedPatients = get().patients.map(p => p.id === patient.id ? patient : p)
+                    set({
+                        patients:updtedPatients,
+                        activePatient: ''
+                    })
+                }
+            }),{
+                name: 'patients-storage',
+                // storage: createJSONStorage(() => localStorage), por defecto es localStorage
+            } 
+        )
+    )
 )
