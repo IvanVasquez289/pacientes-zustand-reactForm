@@ -3,6 +3,7 @@ import Error from "./Error"
 import { DraftPatient } from "../types"
 import { usePatientStore } from "../store"
 import { useEffect } from "react"
+import { toast } from "react-toastify"
 
 export default function PatientForm() {
   
@@ -31,8 +32,10 @@ export default function PatientForm() {
 
         if(activePatient) {
             updatePatient({...data, id: activePatient})
+            toast.info('Paciente actualizado correctamente')
         }else{
             addPatient(data)
+            toast.success('Paciente agregado correctamente')
         }
         reset()
     }
@@ -152,7 +155,7 @@ export default function PatientForm() {
               <input
                   type="submit"
                   className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
-                  value='Guardar Paciente'
+                  value={activePatient ? 'Guardar cambios' : 'Agregar Paciente'}
               />
           </form> 
       </div>
